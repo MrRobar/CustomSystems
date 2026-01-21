@@ -8,9 +8,12 @@ namespace DragNDrop.Scripts
     {
         [SerializeField] private Canvas _canvas;
         [SerializeField] private Piece _piecePrefab;
+        [SerializeField] private RectTransform _dragLayer;
         [SerializeField] private List<Cell> _allCells;
 
         private readonly PieceType[] _spawnTypes = { PieceType.Red, PieceType.Blue, PieceType.Green };
+        public RectTransform DragLayer => _dragLayer;
+        public List<Cell> AllCells => _allCells;
 
         private void Awake()
         {
@@ -33,12 +36,23 @@ namespace DragNDrop.Scripts
             cell.SetPiece(piece);
         }
 
-        private Piece CreatePiece(PieceType type, int lvl)
+        public Piece CreatePiece(PieceType type, int lvl)
         {
             var go = Instantiate(_piecePrefab.gameObject, _canvas.transform, false);
             var piece = go.GetComponent<Piece>();
             piece.Init(type, lvl);
             return piece;
+        }
+
+        public Cell GetCellUnderPointer(Vector2 screenPoint)
+        {
+            foreach (var cell in _allCells)
+            {
+                if (RectTransformUtility.RectangleContainsScreenPoint(cell.Rect, screenPoint, _canvas.worldCamera))
+                    return cell;
+            }
+
+            return null;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,8 +13,13 @@ namespace DragNDrop.Scripts
         [SerializeField] private TextMeshProUGUI _levelText;
         [SerializeField] private RectTransform _rectTransform;
         [SerializeField] private CanvasGroup _canvasGroup;
-        
         private Cell _currentCell;
+
+        public Cell CurrentCell => _currentCell;
+        public CanvasGroup CanvasGroup => _canvasGroup;
+        public RectTransform RectTransform => _rectTransform;
+        public PieceType PieceType => _pieceType;
+        public int Level => _level;
 
         public void Init(PieceType t, int lvl)
         {
@@ -38,12 +44,30 @@ namespace DragNDrop.Scripts
             _currentCell = cell;
             transform.SetParent(parent, false);
             _rectTransform.anchoredPosition = position;
-            _canvasGroup.blocksRaycasts = blockRaycasts; // Test
+            _canvasGroup.blocksRaycasts = blockRaycasts;
         }
 
         public void ResetCurrentCell()
         {
             _currentCell = null;
+        }
+
+        public Tween PlayMergeAnim(
+            float peakScale = 1.6f,
+            float upTime = 0.12f,
+            float downTime = 0.1f)
+        {
+            transform.localScale = Vector3.one;
+
+            return transform
+                .DOScale(Vector3.one * peakScale, upTime)
+                .SetEase(Ease.OutBack)
+                .OnComplete(() =>
+                {
+                    transform
+                        .DOScale(Vector3.one, downTime)
+                        .SetEase(Ease.OutBack);
+                });
         }
     }
 }
